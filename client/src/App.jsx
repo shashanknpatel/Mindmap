@@ -1,11 +1,9 @@
-import AddNote from "./components/AddNote";
-import StickyNote from "./components/StickyNote";
+import Whiteboard from "./components/Whiteboard";
 
 export default function App() {
   return(
     <div>
-      <AddNote/>
-      <StickyNote/>
+      <Whiteboard/>
     </div>
   )
 }

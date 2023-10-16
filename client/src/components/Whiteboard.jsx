@@ -1,53 +1,67 @@
-// Whiteboard.js
 import React, { useState } from 'react';
-import { useDrag } from 'react-dnd';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import '../index.css';
-
-// Node component
-const Node = ({ left, top, text }) => {
-  const [, ref] = useDrag(() => ({
-    type: 'node',
-    item: { left, top, text },
-  }));
-
-  return (
-    <div
-      ref={ref}
-      className="whiteboard-node"
-      style={{ left, top }}
-    >
-      {text}
-    </div>
-  );
-};
+import StickyNote from './StickyNote';
 
 const Whiteboard = () => {
-  const [nodes, setNodes] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [lines, setLines] = useState([]);
+  const [noteIdCounter, setNoteIdCounter] = useState(0);
 
-  const addNode = (x, y) => {
-    setNodes([...nodes, { left: x, top: y, text: 'Node' }]);
+  const addNote = (top, left) => {
+    const newNoteId = `note-${noteIdCounter}`;
+    setNotes([...notes, { id: newNoteId, top, left, text: '' }]);
+    setNoteIdCounter(noteIdCounter + 1);
+
+    // Connect the new note to the original one with a line
+    if (notes.length > 0) {
+      setLines([
+        ...lines,
+        { id: `line-${newNoteId}`, from: newNoteId, to: notes[0].id },
+      ]);
+    }
+  };
+
+  const updateNoteText = (id, text) => {
+    const updatedNotes = notes.map((note) => {
+      if (note.id === id) {
+        return { ...note, text };
+      }
+      return note;
+    });
+    setNotes(updatedNotes);
   };
 
   return (
-    <div className="whiteboard-container">
-      <button onClick={() => addNode(50, 50)}>Add Node</button>
-      <div className="whiteboard">
-        {nodes.map((node, index) => (
-          <Node key={index} {...node} />
+    <div className="relative flex w-screen h-screen overflow-hidden bg-slate-100">
+      <div className="static grid grid-cols-5 grid-rows-5 w-full h-full">
+        {Array.from({ length: 25 }, (_, index) => (
+          <div
+            key={index}
+            className="border border-dashed border-gray-300 h-full"
+          ></div>
         ))}
       </div>
+      {notes.map((note) => (
+        <StickyNote
+          key={note.id}
+          id={note.id}
+          top={note.top}
+          left={note.left}
+          onAddNote={(id, top, left) => addNote(top, left)}
+          onTextChange={(id, text) => updateNoteText(id, text)}
+          text={note.text}
+        />
+      ))}
+      {/* Default StickyNote */}
+      <StickyNote
+        id="default"
+        top={100} // Set the initial position
+        left={100}
+        onAddNote={addNote}
+        onTextChange={updateNoteText}
+        text=""
+      />
     </div>
   );
 };
 
-const App = () => {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Whiteboard />
-    </DndProvider>
-  );
-};
-
-export default App;
+export default Whiteboard;
