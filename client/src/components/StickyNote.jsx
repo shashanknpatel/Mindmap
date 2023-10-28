@@ -11,26 +11,26 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
   };
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handlePointerMove = (e) => {
       if (isDragging) {
         handleDrag(id, e.clientX, e.clientY);
       }
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       setIsDragging(false);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
     };
   }, [isDragging, handleDrag]);
 
-  const handleMouseDown = () => {
+  const handlePointerDown = () => {
     setIsDragging(true);
   };
 
@@ -43,7 +43,7 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
     <div
       className="absolute w-60 h-60 bg-emerald-300 p-3 rounded-lg shadow-xl transform"
       style={{ top, left , ...stickyNoteStyle }}
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
     >{id}
       <button
         className="absolute left-0 top-1/2 transform -translate-y-1/2 font-bold text-4xl mr-4 ml-1"
