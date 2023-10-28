@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag , scale }) => {
   const [inputValue, setInputValue] = useState(text);
@@ -10,6 +10,9 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
     transformOrigin: 'top left',
     touchAction: 'none' // prevent default touch behavior
   };
+
+  // Create a ref for the sticky note div
+  const stickyNoteRef = useRef(null);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -25,9 +28,15 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
     window.addEventListener('pointermove', handleMouseMove); // use pointermove instead of mousemove
     window.addEventListener('pointerup', handleMouseUp); // use pointerup instead of mouseup
 
+    // Add a non-passive wheel event listener to the sticky note div
+    stickyNoteRef.current.addEventListener('wheel', handleWheel, { passive: false });
+
     return () => {
       window.removeEventListener('pointermove', handleMouseMove);
       window.removeEventListener('pointerup', handleMouseUp);
+
+      // Remove the wheel event listener from the sticky note div
+      stickyNoteRef.current.removeEventListener('wheel', handleWheel, { passive: false });
     };
   }, [isDragging, handleDrag]);
 
@@ -40,11 +49,21 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
     onTextChange(id, e.target.value);
   };
 
+  // Define the wheel handler function
+  const handleWheel = (e) => {
+    if (e.altKey) {
+      e.preventDefault(); // No error
+    } else if (e.ctrlKey) {
+      e.preventDefault(); // No error
+    }
+  };
+
   return (
     <div
       className="absolute w-60 h-60 bg-emerald-300 p-3 rounded-lg shadow-xl transform"
       style={{ top, left , ...stickyNoteStyle }}
       onPointerDown={handleMouseDown} // use onPointerDown instead of onMouseDown
+      ref={stickyNoteRef} // assign the ref to the div element
     >{id}
       <button
         className="absolute left-0 top-1/2 transform -translate-y-1/2 font-bold text-4xl mr-4 ml-1"
