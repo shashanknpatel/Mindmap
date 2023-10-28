@@ -7,30 +7,31 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
   // Add a style object for the sticky note div with the transform property based on the scale prop
   const stickyNoteStyle = {
     transform: `scale(${scale})`,
-    transformOrigin: 'top left'
+    transformOrigin: 'top left',
+    touchAction: 'none' // prevent default touch behavior
   };
 
   useEffect(() => {
-    const handlePointerMove = (e) => {
+    const handleMouseMove = (e) => {
       if (isDragging) {
         handleDrag(id, e.clientX, e.clientY);
       }
     };
 
-    const handlePointerUp = () => {
+    const handleMouseUp = () => {
       setIsDragging(false);
     };
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointermove', handleMouseMove); // use pointermove instead of mousemove
+    window.addEventListener('pointerup', handleMouseUp); // use pointerup instead of mouseup
 
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointermove', handleMouseMove);
+      window.removeEventListener('pointerup', handleMouseUp);
     };
   }, [isDragging, handleDrag]);
 
-  const handlePointerDown = () => {
+  const handleMouseDown = () => {
     setIsDragging(true);
   };
 
@@ -43,7 +44,7 @@ const StickyNote = ({ id, top, left, onAddNote, onTextChange, text, handleDrag ,
     <div
       className="absolute w-60 h-60 bg-emerald-300 p-3 rounded-lg shadow-xl transform"
       style={{ top, left , ...stickyNoteStyle }}
-      onPointerDown={handlePointerDown}
+      onPointerDown={handleMouseDown} // use onPointerDown instead of onMouseDown
     >{id}
       <button
         className="absolute left-0 top-1/2 transform -translate-y-1/2 font-bold text-4xl mr-4 ml-1"
